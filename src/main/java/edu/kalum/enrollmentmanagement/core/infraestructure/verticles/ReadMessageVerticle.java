@@ -40,9 +40,8 @@ public class ReadMessageVerticle extends AbstractVerticle {
                 logger.info("Conexion exitosa a Rabbit");
                 this.rabbitMQClient.basicConsumer("edu.kalum.queue.order",new QueueOptions().setAutoAck(false)).onSuccess(consummer -> {
                     consummer.handler(message -> {
-                        logger.info("Envio del mensaje al Event Bus");
                         this.eventBus.request(this.BUS_EVENT_ENROLLMENT_MANAGEMENT,message.body().toJson()).onSuccess(handlerMessage -> {
-                            System.out.print(handlerMessage.body().toString());
+                            System.out.println(handlerMessage.body().toString());
                         });
                        this.rabbitMQClient.basicAck(message.envelope().getDeliveryTag(),false);
                     });

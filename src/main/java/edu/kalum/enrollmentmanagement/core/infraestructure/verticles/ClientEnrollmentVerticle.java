@@ -32,16 +32,26 @@ public class ClientEnrollmentVerticle extends AbstractVerticle {
     private void sendOrder() {
         this.eventBus.consumer(this.BUS_EVENT_ENROLLMENT_MANAGEMENT, handlerMessage -> {
             String jsonString = new String(Base64.getDecoder().decode(handlerMessage.body().toString()));
-            JsonObject data = new JsonObject(jsonString).getJsonObject("data");
-            logger.info("Lectura del mensaje del event bus");
+            JsonObject order = new JsonObject(jsonString);
+            JsonObject data = order.getJsonObject("data");
             this.webClient.post(9080,"localhost","/enrollment-management/v1/enrollment")
                     .putHeader("Content-Type","application/json")
                     .as(BodyCodec.buffer())
                     .sendBuffer(data.toBuffer())
                     .onSuccess(response -> {
-                        logger.info(response.bodyAsString());
+                        if(response.bodyAsJsonObject().getInteger("statusCode") == 201) {
+                            order.put("status","COMPLETED");
+                        } else {
+                            order.put("status","FAILED");
+                            order.put("errors",response.bodyAsJsonObject());
+                        }
                     }).onComplete(resp -> {
-                        handlerMessage.reply(new JsonObject().put("status","success"));
+                        if(resp.succeeded()) {
+                            handlerMessage.reply(order);
+                        } else {
+                            order.put("status","SERVICE_UNAVAILABLE");
+                            handlerMessage.reply(order);
+                        }
                     });
         });
     }
