@@ -51,7 +51,7 @@ public class ClientEnrollmentVerticle extends AbstractVerticle {
             JsonObject order = new JsonObject(jsonString);
             JsonObject data = order.getJsonObject("data");
             this.circuitBreaker.<JsonObject>execute(promise -> {
-                this.webClient.post(9080,"localhost","/enrollment-management/v1/enrollment")
+                this.webClient.post(config().getJsonObject("enrollmentProcess").getInteger("port"),config().getJsonObject("enrollmentProcess").getString("host"),config().getJsonObject("enrollmentProcess").getString("path"))
                         .putHeader("Content-Type","application/json")
                         .as(BodyCodec.buffer())
                         .sendBuffer(data.toBuffer())

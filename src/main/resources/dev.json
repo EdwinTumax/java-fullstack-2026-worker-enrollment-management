@@ -1,0 +1,15 @@
+{
+  "rabbit": {
+    "user": "guest",
+    "password": "guest",
+    "host": "localhost",
+    "port": 5672,
+    "virtualHost": "/",
+    "queue": "edu.kalum.queue.order"
+  },
+  "enrollmentProcess": {
+    "host": "localhost",
+    "port": 9080,
+    "path": "/enrollment-management/v1/enrollment"
+  }
+}

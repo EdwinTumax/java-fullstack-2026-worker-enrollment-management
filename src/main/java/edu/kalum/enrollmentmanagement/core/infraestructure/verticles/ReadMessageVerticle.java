@@ -28,17 +28,17 @@ public class ReadMessageVerticle extends AbstractVerticle {
 
     public void readMessage() {
         RabbitMQOptions config = new RabbitMQOptions();
-        config.setUser("guest");
-        config.setPassword("guest");
-        config.setHost("localhost");
-        config.setPort(5672);
-        config.setVirtualHost("/");
+        config.setUser(config().getJsonObject("rabbit").getString("user"));
+        config.setPassword(config().getJsonObject("rabbit").getString("password"));
+        config.setHost(config().getJsonObject("rabbit").getString("host"));
+        config.setPort(config().getJsonObject("rabbit").getInteger("port"));
+        config.setVirtualHost(config().getJsonObject("rabbit").getString("virtualHost"));
         config.setAutomaticRecoveryEnabled(true);
         this.rabbitMQClient = RabbitMQClient.create(this.vertx, config);
         this.rabbitMQClient.start().onComplete(startHandler -> {
             if(startHandler.succeeded()) {
                 logger.info("Conexion exitosa a Rabbit");
-                this.rabbitMQClient.basicConsumer("edu.kalum.queue.order",new QueueOptions().setAutoAck(false)).onSuccess(consummer -> {
+                this.rabbitMQClient.basicConsumer(config().getJsonObject("rabbit").getString("queue"),new QueueOptions().setAutoAck(false)).onSuccess(consummer -> {
                     consummer.handler(message -> {
                         this.eventBus.request(this.BUS_EVENT_ENROLLMENT_MANAGEMENT,message.body().toJson()).onSuccess(handlerMessage -> {
                             logger.info(handlerMessage.body().toString());
