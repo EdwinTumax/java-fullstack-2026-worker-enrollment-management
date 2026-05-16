@@ -41,9 +41,12 @@ public class ReadMessageVerticle extends AbstractVerticle {
                 this.rabbitMQClient.basicConsumer("edu.kalum.queue.order",new QueueOptions().setAutoAck(false)).onSuccess(consummer -> {
                     consummer.handler(message -> {
                         this.eventBus.request(this.BUS_EVENT_ENROLLMENT_MANAGEMENT,message.body().toJson()).onSuccess(handlerMessage -> {
-                            System.out.println(handlerMessage.body().toString());
+                            logger.info(handlerMessage.body().toString());
+                            this.rabbitMQClient.basicAck(message.envelope().getDeliveryTag(),false);
+                        }).onFailure(error -> {
+                            logger.error(error.getMessage());
+                            this.rabbitMQClient.basicNack(message.envelope().getDeliveryTag(),false,true);
                         });
-                       this.rabbitMQClient.basicAck(message.envelope().getDeliveryTag(),false);
                     });
                 }).onFailure(error -> {
                     logger.error(error.getMessage());
