@@ -1,0 +1,15 @@
+{
+  "rabbit": {
+    "user": "access-kalum",
+    "password": "Kalum.2026",
+    "host": "dev-java-2026-rabbit",
+    "port": 5672,
+    "virtualHost": "/",
+    "queue": "edu.kalum.queue.order"
+  },
+  "enrollmentProcess": {
+    "host": "dev-java-2026-enrollment-api",
+    "port": 9080,
+    "path": "/enrollment-management/v1/enrollment"
+  }
+}
